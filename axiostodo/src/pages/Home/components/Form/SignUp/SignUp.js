@@ -4,34 +4,55 @@ import useInputs from "hooks/useInputs";
 import useInput from "hooks/useInput";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function SignUpForm({ setForm }) {
-  const [isPasswordConfirm, setIsPasswordConfirm] = useState(false);
   const [{ email, password, passwordConfirm }, onChangeForm] = useInputs({
     email: "",
     password: "",
     passwordConfirm: "",
   });
   const navigate = useNavigate();
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!password || !passwordConfirm) return setIsPasswordConfirm(true);
-    if (password !== passwordConfirm) {
-      return setIsPasswordConfirm(false);
-    }
-    return setIsPasswordConfirm(true);
+    if (password !== passwordConfirm)
+      return setError("비밀번호 확인이 일치하지 않습니다.");
+    setError("");
   }, [password, passwordConfirm]);
 
-  const onSubmitJoin = (e) => {
+  const onSubmitJoin = async (e) => {
     e.preventDefault();
     if (!email || !password) {
       return alert("정보를 입력해주세요");
     }
-    if (!isPasswordConfirm) {
+    if (password !== passwordConfirm) {
       return alert("비밀번호 확인이 일치하지 않습니다");
     }
-    setForm("login");
+
+    // then catch, try catch 컨벤션에 맞춰야 함 ==> then일 때는 성공하고 나서의 로직을 다시 콜백함수로 넘겨야 해서 try를 선호하는 편
+    // 이러한 문제를 해결하기 위해 async await , 예외 처리를 위해 try catch
+    try {
+      const res = await axios.post("http://localhost:9000/user/sign", {
+        // 백엔드와 프론트엔드 주소가 같다. 포트 번호만 다르다. 주소가 생략 가능 => 원래는 생략하면 안 됨
+        email,
+        password,
+      });
+      console.log(res);
+      setForm("login");
+    } catch (err) {
+      setError(err.response.data.error);
+      // throw => 상위 요소에게 에러 해결해! => 현재 여가에선 상위의 try ...catch가 없기 때문에 window에서 에러를 처리하는데 이때 console 찍는 것과 같은 의미가 됨
+      // throw new Error(err);
+      console.error(err);
+    }
   };
+
+  useEffect(() => {
+    setError("");
+  }, [email]);
+
+  const full = email && password;
 
   /*
   과제
@@ -69,10 +90,8 @@ function SignUpForm({ setForm }) {
         />
         <span>비밀번호 확인</span>
       </S.InputBox>
-      <S.Error visible={!isPasswordConfirm}>
-        비밀번호 확인이 일치하지 않습니다.
-      </S.Error>
-      <Button variant={"primary"} size={"full"} disabled={!isPasswordConfirm}>
+      <S.Error visible={error}>{error}</S.Error>
+      <Button variant={"primary"} size={"full"} disabled={error || !full}>
         회원가입
       </Button>
     </S.Form>
