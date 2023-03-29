@@ -5,7 +5,8 @@ import TodoList from "./components/List/TodoList";
 import TodoFormModal from "./components/Modal/TodoForm";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import TodoApi from "apis/todoApi";
 // import { useDispatch, useSelector } from "react-redux";
 // import { addTodo } from "store/todo";
 
@@ -19,44 +20,63 @@ export const print = () => {
 function TodoPage() {
   // state
   const [isOpenAddTodoModal, setIsOpenAddTodoModal] = useState(false);
-  const todoList = [];
+  // const todoList = [];
   // const dispatch = useDispatch();
+  const [todoList, setTodoList] = useState();
+
+  useEffect(() => {
+    const getTodoList = async () => {
+      const res = await TodoApi.getTodo();
+      console.log(res);
+      setTodoList(res.data.data);
+    };
+
+    getTodoList();
+  }, []);
 
   // toast
   const handleAddTodo = (title, content) =>
-    new Promise((resolve, reject) => {
+    new Promise(async (resolve, reject) => {
       if (!title || !content) {
-        return reject("need fullfilled");
+        return alert("빈칸을 채워주세요");
       }
+      return TodoApi.addTodo({ title, content })
+        .then((res) => {
+          if (res.status === 200) {
+            setTodoList([res.data.data, ...todoList]);
+            setIsOpenAddTodoModal(false);
+          }
+        })
+        .catch((err) => {
+          throw new Error(err);
+        });
 
-      setTimeout(() => {
-        const newTodo = {
-          id: Math.floor(Math.random() * 100000),
-          state: false,
-          title,
-          content,
-        };
-        resolve(newTodo);
-      }, 1000);
-    })
-      .then((res) => {
-        // res에는 newTodo가 온다.(resolve의 값을 가져옴)
-        // const newTodoList = [...todoList].push(res)
-        // setTodoList(newTodoList)
-        // dispatch(addTodo(res));
-        /*
-          dispatch({
-            type : "ADD_TODO",
-            payload : rese
-          })
-        */
-        // setTodoList([res, ...todoList]);
-        setIsOpenAddTodoModal(false);
-      })
-      .catch((err) => {
-        //err에는 need fullfiled가 온다.
-        alert(err);
-      });
+      // const newTodo = {
+      //   // id: Math.floor(Math.random() * 100000), ==> arr.length + 1 이런 식으로 작성하면 id가 겹칠 가능성이 크다.
+      //   // state: false,
+      //   title,
+      //   content,
+      // };
+      // resolve(res);
+    });
+  // .then((res) => {
+  //   // res에는 newTodo가 온다.(resolve의 값을 가져옴)
+  //   // const newTodoList = [...todoList].push(res)
+  //   // setTodoList(newTodoList)
+  //   // dispatch(addTodo(res));
+  //   /*
+  //     dispatch({
+  //       type : "ADD_TODO",
+  //       payload : rese
+  //     })
+  //   */
+  //   // setTodoList([res, ...todoList]);
+  //   setIsOpenAddTodoModal(false);
+  // })
+  // .catch((err) => {
+  //   //err에는 need fullfiled가 온다.
+  //   alert(err);
+  // });
 
   const showAddTodoToastMessage = (title, content) => {
     // e.preventDefault() ==> onclick을 막아서 사용하면 안 됨

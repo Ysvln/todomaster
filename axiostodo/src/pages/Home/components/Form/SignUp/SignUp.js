@@ -5,6 +5,7 @@ import useInput from "hooks/useInput";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import authApi from "apis/authApi";
 
 function SignUpForm({ setForm }) {
   const [{ email, password, passwordConfirm }, onChangeForm] = useInputs({
@@ -33,13 +34,16 @@ function SignUpForm({ setForm }) {
     // then catch, try catch 컨벤션에 맞춰야 함 ==> then일 때는 성공하고 나서의 로직을 다시 콜백함수로 넘겨야 해서 try를 선호하는 편
     // 이러한 문제를 해결하기 위해 async await , 예외 처리를 위해 try catch
     try {
-      const res = await axios.post("http://localhost:9000/user/sign", {
+      const { data } = await authApi.signUp(email, password);
+      /* const res = await axios.post("http://localhost:9000/user/sign", {
         // 백엔드와 프론트엔드 주소가 같다. 포트 번호만 다르다. 주소가 생략 가능 => 원래는 생략하면 안 됨
         email,
         password,
       });
-      console.log(res);
-      setForm("login");
+      */
+      if (!alert(data.data)) {
+        setForm("login");
+      }
     } catch (err) {
       setError(err.response.data.error);
       // throw => 상위 요소에게 에러 해결해! => 현재 여가에선 상위의 try ...catch가 없기 때문에 window에서 에러를 처리하는데 이때 console 찍는 것과 같은 의미가 됨

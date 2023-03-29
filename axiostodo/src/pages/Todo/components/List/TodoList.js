@@ -2,6 +2,7 @@
 // import { useDispatch } from "react-redux";
 // import { deleteTodo, updateTodo } from "store/todo";
 import TodoCard from "./Card/Card";
+import { Suspense } from "react";
 
 function TodoList({ todoList, setTodoList }) {
   // const dispatch = useDispatch();
@@ -38,6 +39,7 @@ function TodoList({ todoList, setTodoList }) {
         );
       })}
     </div>
+
     // 상위 컴포넌틍서 하위 컴포넌트로 데이터를 전달하기 위해
     // props(속성)을 사용하여 데이터를 전달
   );

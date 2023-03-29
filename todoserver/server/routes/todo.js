@@ -1,22 +1,22 @@
-import express from 'express';
-import { jwtAuth } from '../middlewares/jwtAuth.js';
-import { TodoService } from '../services/todoService.js';
+import express from "express";
+import { jwtAuth } from "../middlewares/jwtAuth.js";
+import { TodoService } from "../services/todoService.js";
 const router = express.Router();
 
-router.post('/', jwtAuth, TodoService.create);
+router.post("/", TodoService.create);
 
 // post /todo body => {cotnent, title}
 
-router.get('/', jwtAuth, TodoService.read);
+router.get("/", TodoService.read);
 
 // get /todo
 
-router.put('/:todoId', jwtAuth, TodoService.update);
+router.put("/:todoId", TodoService.update);
 
 // put /todo/3  body => {content, state}
 
-router.delete('/:todoId', jwtAuth, TodoService.delete);
+router.delete("/:todoId", TodoService.delete);
 
-// deltet /todo/3
+// delete /todo/3
 
 export default router;

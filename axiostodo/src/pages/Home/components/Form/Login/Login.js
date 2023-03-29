@@ -5,6 +5,7 @@ import useInput from "hooks/useInput";
 import useInputs from "hooks/useInputs";
 import * as S from "../style";
 import axios from "axios";
+import authApi from "apis/authApi";
 
 function LoginForm() {
   // const [email, onChangeEmail, setEmail] = useInput("");
@@ -35,9 +36,12 @@ function LoginForm() {
 
   const onLoginSubmit = async (e) => {
     e.preventDefault();
+
+    /*
     try {
       // env는 수정 후 서버 종료 후 다시 빌드해야 함
-      const res = await axios.post(
+   
+          const res = await axios.post(
         // const res = await axios.post(
         process.env.REACT_APP_BACKEND_URL + "/user/login",
         {
@@ -46,6 +50,7 @@ function LoginForm() {
         }
       );
 
+  
       const { data } = res.data;
 
       localStorage.setItem("access_token", data.token);
@@ -56,6 +61,16 @@ function LoginForm() {
       // console.log(res);
     } catch (err) {
       console.error(err);
+      alert("아이디와 비밀번호를 확인해주세요");
+    }
+
+      */
+
+    try {
+      const res = await authApi.login(email, password);
+      navigate("/todo");
+    } catch (err) {
+      console.log(err);
       alert("아이디와 비밀번호를 확인해주세요");
     }
   };
