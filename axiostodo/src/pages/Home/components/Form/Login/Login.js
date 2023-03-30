@@ -67,7 +67,49 @@ function LoginForm() {
       */
 
     try {
-      const res = await authApi.login(email, password);
+      const { data: response } = await authApi.login(email, password);
+      console.log(response.token);
+
+      // token == access_token
+      // token 값을 저장할 것, token 값이 있다면 로그인이 된 것
+      // 프론트엔드 로그인 유무 판단
+      /* 
+        1. 웹스토리지 (로컬, 세션스토리지)
+        2. state (redux-persist) => 비추? 새로고침하면 X..
+        3. refreshToken 
+            access_token은 어디에 저장하든 탈취의 위험이 있다.
+            따라서 access_token이 탈취되어도 이 토근에 기간을 설정해서
+            해커에게 제어권이 넘어가는 시간을 최소화한다.
+
+            access_token => 만료 => 사용자는 접근 권한 X => 프론트엔드 로그아웃 처리를 
+
+            사용자가 불편
+
+            요청할 때 access_token --> refresh --> access_token 만료(error)
+
+            프론트엔드 ---> access_token 재발급 --> 다시 http request에 실어서 재요청
+
+
+            browser       ID PW =====>      BACK
+                    <===== token, refresh
+                    
+            브라우저에서 다음 요청을 보낼 때 마다 request에서 header 부분에 token 
+            BACK은 token이 유효한지 확인 , 유효하지 않으면 브라우저에 다시 유효성 에러로
+            브라우저 ==> 1. 세션 만료되면 로그아웃 2. refresh 토큰 ==> BACK에 요청
+
+
+            ** 재요청 
+              browser      유효X =====>      BACK
+                        <===== error
+                              ^
+                            axios가 intercept - BACK에 refresh 전달해서 - BACK으로부터 다시 token을 받는다.
+                            이걸 브라우저에 보내지 않고 다시 BACK에 재요청을 한다.
+                            BACK은 그 재요청을 받고 이번에는 유효한 token
+          03.05 02:15
+
+      */
+
+      // console.log(res);
       navigate("/todo");
     } catch (err) {
       console.log(err);

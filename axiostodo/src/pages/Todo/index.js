@@ -22,7 +22,7 @@ function TodoPage() {
   const [isOpenAddTodoModal, setIsOpenAddTodoModal] = useState(false);
   // const todoList = [];
   // const dispatch = useDispatch();
-  const [todoList, setTodoList] = useState();
+  const [todoList, setTodoList] = useState([]);
 
   useEffect(() => {
     const getTodoList = async () => {
@@ -44,8 +44,9 @@ function TodoPage() {
         .then((res) => {
           if (res.status === 200) {
             setTodoList([res.data.data, ...todoList]);
-            setIsOpenAddTodoModal(false);
           }
+
+          setIsOpenAddTodoModal(false);
         })
         .catch((err) => {
           throw new Error(err);
@@ -108,7 +109,7 @@ function TodoPage() {
         <S.Container>
           <S.Title>List</S.Title>
           <S.Content>
-            <TodoList todoList={todoList} />
+            <TodoList todoList={todoList} setTodoList={setTodoList} />
           </S.Content>
           <S.ButtonBox>
             {/* 괄호 안 감싸도 상관 없음. 프롭스 전달하는 것만 감싸는 의미정도 */}

@@ -3,11 +3,12 @@
 // import { deleteTodo, updateTodo } from "store/todo";
 import TodoCard from "./Card/Card";
 import { Suspense } from "react";
+import TodoApi from "apis/todoApi";
 
 function TodoList({ todoList, setTodoList }) {
   // const dispatch = useDispatch();
 
-  const handleUpdateTodo = (id, content, state) => {
+  const handleUpdateTodo = async (id, content, state) => {
     // dispatch(updateTodo({ id, content, state }));
     /*
       action.payload = {
@@ -16,10 +17,22 @@ function TodoList({ todoList, setTodoList }) {
         state
       }
     */
+    try {
+      const { data } = await TodoApi.updateTodo(id, { content, state });
+      const newTodoList = [...todoList];
+      const index = newTodoList.findIndex((todo) => todo.id === data.data.id);
+      newTodoList[index] = data.data;
+      setTodoList(newTodoList);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const onDeleteTodo = (id) => {
+  const onDeleteTodo = async (id) => {
     if (window.confirm("정말 삭제하시겠습니까?")) {
+      const { data } = await TodoApi.deleteTodo(id);
+      setTodoList(todoList.filter((todo) => todo.id !== data.data));
+
       // dispatch(deleteTodo(id));
       /* action.payload = id */
     }
