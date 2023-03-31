@@ -71,7 +71,7 @@ function LoginForm() {
       const { data: response } = await authApi.login(email, password);
       console.log(response.token);
 
-      TokenService.setToken(response.data);
+      TokenService.setToken(response.token);
 
       if (TokenService.getToken()) {
         navigate("/todo");

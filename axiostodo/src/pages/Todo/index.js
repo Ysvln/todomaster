@@ -44,6 +44,7 @@ function TodoPage() {
         .then((res) => {
           if (res.status === 200) {
             setTodoList([res.data.data, ...todoList]);
+            resolve(res);
           }
 
           setIsOpenAddTodoModal(false);
