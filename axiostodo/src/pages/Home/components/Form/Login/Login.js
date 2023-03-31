@@ -6,6 +6,7 @@ import useInputs from "hooks/useInputs";
 import * as S from "../style";
 import axios from "axios";
 import authApi from "apis/authApi";
+import TokenService from "repository/TokenService";
 
 function LoginForm() {
   // const [email, onChangeEmail, setEmail] = useInput("");
@@ -70,6 +71,12 @@ function LoginForm() {
       const { data: response } = await authApi.login(email, password);
       console.log(response.token);
 
+      TokenService.setToken(response.data);
+
+      if (TokenService.getToken()) {
+        navigate("/todo");
+      }
+
       // token == access_token
       // token 값을 저장할 것, token 값이 있다면 로그인이 된 것
       // 프론트엔드 로그인 유무 판단
@@ -105,7 +112,6 @@ function LoginForm() {
                             axios가 intercept - BACK에 refresh 전달해서 - BACK으로부터 다시 token을 받는다.
                             이걸 브라우저에 보내지 않고 다시 BACK에 재요청을 한다.
                             BACK은 그 재요청을 받고 이번에는 유효한 token
-          03.05 02:15
 
       */
 
